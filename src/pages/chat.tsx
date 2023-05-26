@@ -44,14 +44,14 @@ const DocsPage = () => {
           reader.read().then(({ value, done }) => {
             const decoder = new TextDecoder();
             const result = JSON.parse(decoder.decode(value));
-            if (result.error.code === "invalid_api_key") {
+            if (result.error && result.error.code === "invalid_api_key") {
               setContent("");
               let answer = document.createElement("p");
               answer.style.color = "red";
               answer.textContent = `A：无效的API Key`;
               chatBox.appendChild(answer);
               chatBox.appendChild(divider);
-              return
+              return;
             }
             const message = result.choices[0].message.content;
             setText(message);
@@ -85,8 +85,9 @@ const DocsPage = () => {
         onInput={handleAPIKey}
       />
       <br></br>
-      <input
-        type="text"
+      <textarea
+        rows="5"
+        cols="33"
         id="chatInput"
         value={content}
         onInput={handleChatInput}
