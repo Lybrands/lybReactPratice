@@ -4,9 +4,14 @@ const DocsPage = () => {
   const [text, setText] = useState("");
   const [content, setContent] = useState("");
   const [isGenerate, setIsGenerate] = useState(false);
+  const [key, setKey] = useState('');
 
   function handleChatInput(e: any) {
     setContent(e.target.value);
+  }
+
+  function handleAPIKey(e: any) {
+    setKey(e.target.value)
   }
 
   const chatFun = () => {
@@ -23,7 +28,7 @@ const DocsPage = () => {
       headers: {
         "Content-Type": "application/json",
         Authorization:
-          "Bearer 1",
+          `Bearer ${key}`,
       },
       method: "post",
       body: JSON.stringify({
@@ -53,7 +58,7 @@ const DocsPage = () => {
           setContent("");
           let answer = document.createElement("p");
           answer.style.color = "red";
-          answer.textContent = `回答：生成失败`;
+          answer.textContent = `回答：生成失败 请重试或者检查API key 是否正确`;
           chatBox?.appendChild(answer);
           chatBox?.appendChild(divider)
         }
@@ -65,6 +70,7 @@ const DocsPage = () => {
 
   return (
     <div>
+      <input type="text" placeholder="输入你的openAI API Key" value={key} onInput={handleAPIKey} /><br></br>
       <input
         type="text"
         id="chatInput"
