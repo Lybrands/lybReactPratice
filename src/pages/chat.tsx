@@ -4,14 +4,14 @@ const DocsPage = () => {
   const [text, setText] = useState("");
   const [content, setContent] = useState("");
   const [isGenerate, setIsGenerate] = useState(false);
-  const [key, setKey] = useState('');
+  const [key, setKey] = useState("");
 
   function handleChatInput(e: any) {
     setContent(e.target.value);
   }
 
   function handleAPIKey(e: any) {
-    setKey(e.target.value)
+    setKey(e.target.value);
   }
 
   const chatFun = () => {
@@ -21,14 +21,13 @@ const DocsPage = () => {
     chatBox?.appendChild(question);
     setContent("...生成中");
     setIsGenerate(true);
-    let divider = document.createElement('div')
-    divider.textContent = '----------------'
+    let divider = document.createElement("div");
+    divider.textContent = "----------------";
 
     const data = {
       headers: {
         "Content-Type": "application/json",
-        Authorization:
-          `Bearer ${key}`,
+        Authorization: `Bearer ${key}`,
       },
       method: "post",
       body: JSON.stringify({
@@ -42,25 +41,34 @@ const DocsPage = () => {
         (res) => {
           const readableStream = res.body;
           const reader = readableStream && readableStream.getReader();
-          reader?.read().then(({ value, done }) => {
+          reader.read().then(({ value, done }) => {
             const decoder = new TextDecoder();
             const result = JSON.parse(decoder.decode(value));
+            if (result.error.code === "invalid_api_key") {
+              setContent("");
+              let answer = document.createElement("p");
+              answer.style.color = "red";
+              answer.textContent = `回答：无效的API Key`;
+              chatBox.appendChild(answer);
+              chatBox.appendChild(divider);
+              return
+            }
             const message = result.choices[0].message.content;
             setText(message);
             setContent("");
             let answer = document.createElement("p");
             answer.textContent = `回答：${message}`;
-            chatBox?.appendChild(answer);
-            chatBox?.appendChild(divider)
+            chatBox.appendChild(answer);
+            chatBox.appendChild(divider);
           });
         },
         (res) => {
           setContent("");
           let answer = document.createElement("p");
           answer.style.color = "red";
-          answer.textContent = `回答：生成失败 请重试或者检查API key 是否正确`;
-          chatBox?.appendChild(answer);
-          chatBox?.appendChild(divider)
+          answer.textContent = `回答：生成失败 请重试...`;
+          chatBox.appendChild(answer);
+          chatBox.appendChild(divider);
         }
       )
       .then(() => {
@@ -70,7 +78,13 @@ const DocsPage = () => {
 
   return (
     <div>
-      <input type="text" placeholder="输入你的openAI API Key" value={key} onInput={handleAPIKey} /><br></br>
+      <input
+        type="text"
+        placeholder="输入你的openAI API Key"
+        value={key}
+        onInput={handleAPIKey}
+      />
+      <br></br>
       <input
         type="text"
         id="chatInput"

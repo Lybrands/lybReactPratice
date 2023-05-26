@@ -1,12 +1,124 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-	<meta charset="UTF-8">
-	<meta http-equiv="X-UA-Compatible" content="IE=edge">
-	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>Document</title>
-</head>
-<body>
-	hello
-</body>
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+  </head>
+  <body>
+    <div id="test"></div>
+  </body>
+  <script
+    src="https://unpkg.com/react@18/umd/react.development.js"
+    crossorigin
+  ></script>
+  <script
+    src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"
+    crossorigin
+  ></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+  <script type="text/babel">
+    const DocsPage = () => {
+      const [text, setText] = React.useState("");
+      const [content, setContent] = React.useState("");
+      const [isGenerate, setIsGenerate] = React.useState(false);
+      const [key, setKey] = React.useState("");
+
+      function handleChatInput(e) {
+        setContent(e.target.value);
+      }
+
+      function handleAPIKey(e) {
+        setKey(e.target.value);
+      }
+
+      const chatFun = () => {
+        const chatBox = document.querySelector("#chatBox");
+        let question = document.createElement("p");
+        question.textContent = `提问：${content}`;
+        chatBox.appendChild(question);
+        setContent("...生成中");
+        setIsGenerate(true);
+        let divider = document.createElement("div");
+        divider.textContent = "----------------";
+
+        const data = {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${key}`,
+          },
+          method: "post",
+          body: JSON.stringify({
+            model: "gpt-3.5-turbo",
+            messages: [{ role: "user", content: content }],
+            temperature: 0.7,
+          }),
+        };
+        fetch("https://api.openai.com/v1/chat/completions", data)
+          .then(
+            (res) => {
+              const readableStream = res.body;
+              const reader = readableStream && readableStream.getReader();
+              reader.read().then(({ value, done }) => {
+                const decoder = new TextDecoder();
+                const result = JSON.parse(decoder.decode(value));
+                if (result.error.code === 'invalid_api_key') {
+                  setContent("");
+                  let answer = document.createElement("p");
+                  answer.style.color = "red";
+                  answer.textContent = `回答：无效的API Key`;
+                  chatBox.appendChild(answer);
+                  chatBox.appendChild(divider);
+									return
+                }
+                const message = result.choices[0].message.content;
+                setText(message);
+                setContent("");
+                let answer = document.createElement("p");
+                answer.textContent = `回答：${message}`;
+                chatBox.appendChild(answer);
+                chatBox.appendChild(divider);
+              });
+            },
+            (res) => {
+              setContent("");
+              let answer = document.createElement("p");
+              answer.style.color = "red";
+              answer.textContent = `回答：生成失败 请重试...`;
+              chatBox.appendChild(answer);
+              chatBox.appendChild(divider);
+            }
+          )
+          .then(() => {
+            setIsGenerate(false);
+          });
+      };
+
+      return (
+        <div>
+          <input
+            type="text"
+            placeholder="输入你的openAI API Key"
+            value={key}
+            onInput={handleAPIKey}
+          />
+          <br></br>
+          <input
+            type="text"
+            id="chatInput"
+            value={content}
+            onInput={handleChatInput}
+          />
+          <button onClick={chatFun} disabled={isGenerate}>
+            start
+          </button>
+          <div id="chatBox" style={{ whiteSpace: "pre-line" }}></div>
+        </div>
+      );
+    };
+    const root = ReactDOM.createRoot(document.getElementById("test"));
+    root.render(<DocsPage />);
+  </script>
 </html>
