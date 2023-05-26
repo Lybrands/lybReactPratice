@@ -17,7 +17,7 @@ const DocsPage = () => {
   const chatFun = () => {
     const chatBox = document.querySelector("#chatBox");
     let question = document.createElement("p");
-    question.textContent = `提问：${content}`;
+    question.textContent = `Q：${content}`;
     chatBox?.appendChild(question);
     setContent("...生成中");
     setIsGenerate(true);
@@ -48,7 +48,7 @@ const DocsPage = () => {
               setContent("");
               let answer = document.createElement("p");
               answer.style.color = "red";
-              answer.textContent = `回答：无效的API Key`;
+              answer.textContent = `A：无效的API Key`;
               chatBox.appendChild(answer);
               chatBox.appendChild(divider);
               return
@@ -57,7 +57,7 @@ const DocsPage = () => {
             setText(message);
             setContent("");
             let answer = document.createElement("p");
-            answer.textContent = `回答：${message}`;
+            answer.textContent = `A：${message}`;
             chatBox.appendChild(answer);
             chatBox.appendChild(divider);
           });
@@ -66,7 +66,7 @@ const DocsPage = () => {
           setContent("");
           let answer = document.createElement("p");
           answer.style.color = "red";
-          answer.textContent = `回答：生成失败 请重试...`;
+          answer.textContent = `A：生成失败 请重试...`;
           chatBox.appendChild(answer);
           chatBox.appendChild(divider);
         }
