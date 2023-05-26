@@ -23,7 +23,7 @@ const DocsPage = () => {
       headers: {
         "Content-Type": "application/json",
         Authorization:
-          "Bearer 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",
+          "Bearer 1",
       },
       method: "post",
       body: JSON.stringify({
