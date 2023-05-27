@@ -1,0 +1,74 @@
+.answerError {
+	color: var(--chat-weight);
+}
+.markdown {
+	// background-color: #1A1A1D;
+	color: #fff;
+}
+
+.chat-main {
+	width: 1200px;
+	margin: 0 auto;
+	position: relative;
+	display: flex;
+	padding-top: 50px;
+	justify-content: center;
+	flex-wrap: wrap;
+}
+.chat-key {
+	position: absolute;
+	width: 300px;
+	height: 30px;
+	right: 0;
+	top: 0;
+	padding-left: 6px;
+}
+
+.chat-input {
+	display: flex;
+	justify-content: center;
+}
+
+#chatInput {
+	width: 1000px;
+	height: 40px;
+	border-radius: 8px;
+	padding-left: 10px;
+	color: #1A1A1D;
+	font-size: 18px;
+}
+
+.chat-button {
+	background-color: var(--chat-assist-color-g-1);
+	width: 80px;
+	height: 40px;
+	margin-left: 10px;
+	border-radius: 8px;
+	color: #fff;
+	font-size: 18px;
+}
+
+#chatBox {
+	width: 1100px;
+	box-sizing: border-box;
+	padding: 20px;
+	background: #525252;
+	margin: 50px auto;
+	border-radius: 12px;
+	min-height: 700px;
+	overflow-y: scroll;
+	color: #fff;
+}
+::-webkit-scrollbar {
+  width: 8px; /* 滚动条宽度 */
+}
+
+/* 滚动条滑块 */
+::-webkit-scrollbar-thumb {
+  background-color: #999; /* 滑块颜色 */
+}
+
+/* 鼠标悬停时的滚动条滑块 */
+::-webkit-scrollbar-thumb:hover {
+  background-color: #666; /* 鼠标悬停时的滑块颜色 */
+}

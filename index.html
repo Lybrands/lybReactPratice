@@ -6,6 +6,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Document</title>
   </head>
+  <style>
+    .answerError {
+      color: #f00;
+    }
+  </style>
   <body>
     <div id="test"></div>
   </body>
@@ -20,11 +25,31 @@
   <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
 
   <script type="text/babel">
+    const QuestionComp = (props) => {
+      return <p>Q: {props.content}</p>;
+    };
+    const AnswerComp = (props) => {
+      return (
+        <div>
+          <p className={props.error ? "answerError" : ""}>A: {props.content}</p>
+          <div>-------------------------------------------</div>
+        </div>
+      );
+    };
+
+    const keyObj = { value: 0 };
+    let index = 0;
+    Object.defineProperty(keyObj, "value", {
+      get() {
+        return index++;
+      },
+    });
     const DocsPage = () => {
       const [text, setText] = React.useState("");
       const [content, setContent] = React.useState("");
       const [isGenerate, setIsGenerate] = React.useState(false);
       const [key, setKey] = React.useState("");
+      const [dialogCompArr, setDialogCompArr] = React.useState([]);
 
       function handleChatInput(e) {
         setContent(e.target.value);
@@ -34,16 +59,18 @@
         setKey(e.target.value);
       }
 
+      // 对话区
+      function addDialogCompHandle(component) {
+        setContent("");
+        setDialogCompArr((prev) => [...prev, component]);
+      }
+
       const chatFun = () => {
-        const chatBox = document.querySelector("#chatBox");
-        let question = document.createElement("p");
-        question.textContent = `Q：${content}`;
-        chatBox.appendChild(question);
+        addDialogCompHandle(
+          <QuestionComp content={content} key={keyObj.value} />
+        );
         setContent("...生成中");
         setIsGenerate(true);
-        let divider = document.createElement("div");
-        divider.textContent = "-------------------------------------------";
-
         const data = {
           headers: {
             "Content-Type": "application/json",
@@ -65,37 +92,45 @@
                 const decoder = new TextDecoder();
                 const result = JSON.parse(decoder.decode(value));
                 if (result.error && result.error.code === "invalid_api_key") {
-                  setContent("");
-                  let answer = document.createElement("p");
-                  answer.style.color = "red";
-                  answer.textContent = `A：无效的API Key`;
-                  chatBox.appendChild(answer);
-                  chatBox.appendChild(divider);
+                  addDialogCompHandle(
+                    <AnswerComp
+                      content="无效的API Key"
+                      error
+                      key={keyObj.value}
+                    />
+                  );
+                  return;
+                } else if (result.error && result.error.code === null) {
+                  addDialogCompHandle(
+                    <AnswerComp
+                      content="缺少API Key"
+                      error
+                      key={keyObj.value}
+                    />
+                  );
                   return;
                 }
                 const message = result.choices[0].message.content;
                 setText(message);
-                setContent("");
-                let answer = document.createElement("p");
-                answer.textContent = `A：${message}`;
-                chatBox.appendChild(answer);
-                chatBox.appendChild(divider);
+                addDialogCompHandle(
+                  <AnswerComp content={message} key={result.id} />
+                );
               });
             },
             (res) => {
-              setContent("");
-              let answer = document.createElement("p");
-              answer.style.color = "red";
-              answer.textContent = `A：生成失败 请重试...`;
-              chatBox.appendChild(answer);
-              chatBox.appendChild(divider);
+              addDialogCompHandle(
+                <AnswerComp
+                  content={"生成失败 请重试..."}
+                  error
+                  key={keyObj.value}
+                />
+              );
             }
           )
           .then(() => {
             setIsGenerate(false);
           });
       };
-
       return (
         <div>
           <input
@@ -107,7 +142,7 @@
           <br></br>
           <textarea
             rows="5"
-						cols="33"
+            cols="33"
             id="chatInput"
             value={content}
             onInput={handleChatInput}
@@ -115,7 +150,9 @@
           <button onClick={chatFun} disabled={isGenerate}>
             start
           </button>
-          <div id="chatBox" style={{ whiteSpace: "pre-line" }}></div>
+          <div id="chatBox" style={{ whiteSpace: "pre-line" }}>
+            {dialogCompArr}
+          </div>
         </div>
       );
     };

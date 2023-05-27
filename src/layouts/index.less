@@ -6,5 +6,48 @@
   }
   li {
     margin-right: 1em;
+    a {
+      color: #fff;
+    }
   }
+}
+
+// 主色调：#2D2D2D（深灰色）
+// 辅助色调：#525252（深灰色）、#808080（中灰色）、#BEBEBE（浅灰色）
+// 强调色调：#FF6B6B（红色）
+// 文字颜色：#FFFFFF（白色）、#CCCCCC（浅灰色）
+
+:root {
+  --chat-body-bg: #2D2D2D;
+  --chat-font: #FFFFFF;
+  --chat-font-dark: #CCCCCC;
+  --chat-weight: #FF6B6B;
+  --chat-assist-color-g-1: #525252;
+  --chat-assist-color-g-2: #808080;
+  --chat-assist-color-g-3: #BEBEBE;
+  --chat-black: #1A1A1D;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  font-size: 14px;
+}
+
+li, a {
+  text-decoration: none;
+  list-style: none;
+}
+
+button, input {
+  outline: none;
+  border: none;
+}
+
+input {
+  color: var(--chat-black)
+}
+
+body {
+  background-color: #2D2D2D;
 }
