@@ -90,7 +90,7 @@ const DocsPage = () => {
     
   };
 
-  function handleKeyDown (e) {
+  function handleKeyDown (e: any) {
     if (e.key === 'Enter') {
       chatFun()
     }
